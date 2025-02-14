@@ -1,4 +1,7 @@
+// Main file
 
+//import my sql queries
+import * as sql from './sql.js';
 
 
 // Node imports
@@ -33,13 +36,17 @@ app.use(express.urlencoded({ extended: true }));
 
 
 
-
-
-
-
 //linking to login page
 app.get('/', (req, res) => {
     res.redirect('/login/');
+})
+
+app.get('/home', (req, res) => {
+    res.redirect('/home')
+})
+
+app.post('/logon', (req, res) => {
+    res.send(sql.getUsers())
 })
 
 
