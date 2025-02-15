@@ -15,7 +15,7 @@ import {configDotenv} from 'dotenv';
 const app = express();
 
 // start the session
-configDotenv();
+/*configDotenv();
 const SECRET = process.env.SECRET;
 
 app.use(session({
@@ -23,7 +23,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {secure: false}
-}));
+}));*/
 
 // get a fixed path
 const __filename = fileURLToPath(import.meta.url);
@@ -35,20 +35,49 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+//site routes
 
 //linking to login page
 app.get('/', (req, res) => {
     res.redirect('/login/');
 })
 
+//going home
 app.get('/home', (req, res) => {
-    res.redirect('/home')
+    res.sendFile(staticPath + '/home')
 })
 
-app.post('/logon', (req, res) => {
-    res.send(sql.getUsers())
+app.get('/blackjack', (req, res) => {
+    res.sendFile(staticPath + '/blackjack')
 })
 
+app.get('/hangman', (req, res) => {
+    res.sendFile(staticPath + '/hangman')
+})
+
+app.get('/rock paper scissors', (req, res) => {
+    res.sendFile(staticPath + '/rock paper scissors')
+})
+
+app.get('/tic-tac-toe', (req, res) => {
+    res.sendFile(staticPath + '/tic-tac-toe')
+})
+
+
+
+
+app.post('/login', (req, res) => {
+    const info = req.body
+    if (sql.login(info.username, info.password)) {
+        return res.redirect('/home')
+    }
+    res.send('wron')
+})
+
+app.get('/fetchgames/', (req, res) => {
+    console.log('noticed')
+    res.send(sql.getGames())
+})
 
 
 app.use(express.static(staticPath));
