@@ -15,7 +15,7 @@ import {configDotenv} from 'dotenv';
 const app = express();
 
 // start the session
-/*configDotenv();
+configDotenv();
 const SECRET = process.env.SECRET;
 
 app.use(session({
@@ -23,7 +23,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {secure: false}
-}));*/
+}));
 
 // get a fixed path
 const __filename = fileURLToPath(import.meta.url);
@@ -44,6 +44,10 @@ app.get('/', (req, res) => {
 
 //going home
 app.get('/home', (req, res) => {
+    if (!req.session.idUser) {
+        req.session.idUser = 1
+    }
+    
     res.sendFile(staticPath + '/home')
 })
 
@@ -68,15 +72,25 @@ app.get('/tic-tac-toe', (req, res) => {
 
 app.post('/login', (req, res) => {
     const info = req.body
+    console.log(info)
     if (sql.login(info.username, info.password)) {
+        req.session.idUser = sql.idGetter('user', info.username)
         return res.redirect('/home')
     }
     res.send('wron')
 })
 
 app.get('/fetchgames/', (req, res) => {
-    console.log('noticed')
     res.send(sql.getGames())
+})
+
+app.post('/regresult', (req, res) => {
+    const info = req.body
+    console.log(info)
+    const newGame = sql.regResult(req.session.idUser, info.name, info.result)
+    console.log('applogger', newGame)
+    return res.send(newGame)
+
 })
 
 

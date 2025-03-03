@@ -31,3 +31,34 @@ export function getGames() {
     let games = sql.all()
     return games
 }
+
+export function regResult (idUser, idGame, result) {
+    let sql = db.prepare(`INSERT INTO record (idUser, idGame, result)
+                            VALUES (?, ?, ?)`)
+    const info = sql.run(idUser, idGetter('game', idGame), result)
+
+    sql = db.prepare(`SELECT user.name, game.name, result
+                        FROM record
+                        INNER JOIN 
+                        user ON user.id = idUser,
+                        game ON game.id = idGame
+                        WHERE record.id = ?`)
+    const row = sql.all(info.lastInsertRowid)
+    console.log('row inserted', row)
+    return row[0]
+}
+
+export function nameGetter(table, id) {
+    const sql = db.prepare(`SELECT name FROM \`${table}\` WHERE id = ?`)
+    const name = sql.get(id)
+    return name.name
+}
+
+export function idGetter(table, name) {
+    const sql = db.prepare(`SELECT id FROM \`${table}\` WHERE name = ?`)
+    const id = sql.get(name)
+    console.log('id', id.id, 'table', table, 'name', name)
+    return id.id
+}
+
+//console.log("id", nameGetter('user', 3))
