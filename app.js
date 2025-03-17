@@ -10,6 +10,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import session from 'express-session';
 import {configDotenv} from 'dotenv';
+import bcrypt from 'bcrypt'
 
 //initialize express
 const app = express();
@@ -60,14 +61,40 @@ app.get('/game', (req, res) => {
 )
 })
 //staticPath + `/${game}/index.html`
-app.post('/login', (req, res) => {
-    const info = req.body
-    console.log(info)
-    if (sql.login(info.username, info.password)) {
-        req.session.idUser = sql.idGetter('user', info.username)
+
+app.post('/login', async (req, res) => {
+    const {userName, password} = req.body
+    console.log(userName, password, 'req:', req.body)
+
+    // Finn brukeren basert på id/email
+    const user = sql.getUser(sql.idGetter('user', userName))
+
+    // Sjekk om passordet samsvarer med hash'en i databasen
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (isMatch) {
+        req.session.idUser = sql.idGetter('user', userName)
         return res.redirect('/home')
-    }
-    res.send('wron')
+    } else {res.send('wron')}
+
+    /*if (!sql.login(userName, password)) {
+        res.send('wron')
+    }*/
+    
+    
+})
+
+app.post('/reguser', async (req, res) => {
+    let user = req.body
+    console.log(user)
+
+    //hash the password
+    const saltRounds = 10
+    const hashedPassword = await bcrypt.hash(user.password, saltRounds)
+
+    user = sql.regUser(user.username, hashedPassword)
+
+    res.redirect('/login')
 })
 
 app.get('/fetchgames/', (req, res) => {

@@ -11,6 +11,15 @@ export function getUsers(){
     return users
 }
 
+export function getUser(id) {
+    console.log(id)
+    let sql = db.prepare('SELECT id as userid, name, password FROM user WHERE user.id  = ?');
+    let rows = sql.all(id)
+    console.log(rows[0])
+    
+    return rows[0]
+}
+
 //checks if a user already exists
 export function userExists(username) {
     let sql = db.prepare(`SELECT name FROM user WHERE name = ?`)
@@ -52,6 +61,25 @@ export function nameGetter(table, id) {
     const sql = db.prepare(`SELECT name FROM \`${table}\` WHERE id = ?`)
     const name = sql.get(id)
     return name.name
+}
+
+export function regUser(name, password) {
+    let sql = db.prepare(`
+        INSERT INTO user 
+        (name, password) 
+        VALUES
+        (?, ?)`)
+    const info = sql.run(name, password)
+    
+    sql = db.prepare(`
+        SELECT user.name, 
+        password
+        FROM user
+        WHERE user.id = ?`)
+    const row = sql.all(info.lastInsertRowid)
+    console.log('row inserted', row)
+    return row[0]
+
 }
 
 export function idGetter(table, name) {
