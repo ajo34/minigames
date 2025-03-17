@@ -51,25 +51,15 @@ app.get('/home', (req, res) => {
     res.sendFile(staticPath + '/home')
 })
 
-app.get('/blackjack', (req, res) => {
-    res.sendFile(staticPath + '/blackjack')
+
+//Route to game sites
+app.get('/game', (req, res) => {
+    const game = req.query.game
+    res.sendFile(path.join(__dirname, "public", game, "index.html")
+    
+)
 })
-
-app.get('/hangman', (req, res) => {
-    res.sendFile(staticPath + '/hangman')
-})
-
-app.get('/rock paper scissors', (req, res) => {
-    res.sendFile(staticPath + '/rock paper scissors')
-})
-
-app.get('/tic-tac-toe', (req, res) => {
-    res.sendFile(staticPath + '/tic-tac-toe')
-})
-
-
-
-
+//staticPath + `/${game}/index.html`
 app.post('/login', (req, res) => {
     const info = req.body
     console.log(info)
