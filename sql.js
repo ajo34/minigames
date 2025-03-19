@@ -37,8 +37,20 @@ export function login(username, password) {
 //gets names of all games
 export function getGames() {
     let sql = db.prepare(`SELECT name FROM game`)
-    let games = sql.all()
+    const games = sql.all()
     return games
+}
+
+export function getRecords() {
+    const sql = db.prepare(`
+        SELECT user.name, idUser, COUNT(*) AS games_won 
+        FROM record 
+        INNER JOIN user on record.idUser = user.id
+        WHERE result = 2 
+        GROUP BY idUser, user.name
+        ORDER BY games_won DESC;`)
+    const stats = sql.all()
+    return stats
 }
 
 export function regResult (idUser, idGame, result) {

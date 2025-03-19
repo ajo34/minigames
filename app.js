@@ -56,11 +56,15 @@ app.get('/home', (req, res) => {
 //Route to game sites
 app.get('/game', (req, res) => {
     const game = req.query.game
-    res.sendFile(path.join(__dirname, "public", game, "index.html")
-    
-)
+    console.log('going to game:', game)
+    res.sendFile(staticPath + `/${game}/index.html`)
 })
-//staticPath + `/${game}/index.html`
+
+app.get('/leaderboard', (req, res) => {
+    console.log('going to leaderboard')
+    res.sendFile(staticPath + '/leaderboard/')
+})
+
 
 app.post('/login', async (req, res) => {
     const {userName, password} = req.body
@@ -105,10 +109,15 @@ app.post('/regresult', (req, res) => {
     const info = req.body
     console.log(info)
     const newGame = sql.regResult(req.session.idUser, info.name, info.result)
-    console.log('applogger', newGame)
     return res.send(newGame)
 
 })
+
+app.get('/fetchrecords/', (req, res) => {
+    res.send(sql.getRecords())
+})
+
+
 
 
 app.use(express.static(staticPath));
